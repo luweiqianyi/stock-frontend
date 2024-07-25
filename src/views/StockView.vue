@@ -9,7 +9,7 @@
         <el-form-item label="买入价格">
             <el-input v-model="form.buy_price" />
         </el-form-item>
-        <el-form-item label="买入数量">
+        <el-form-item label="交易数量">
             <el-input v-model="form.number" />
         </el-form-item>
         <el-form-item label="卖出价格">
@@ -23,6 +23,20 @@
             <el-button type="primary" @click="onCalculate" class="calculate-button">计算</el-button>
         </div>
     </el-form>
+
+    <el-table :data="transactionResult" style="width: 100%" :row-class-name="tableRowClassName">
+        <el-table-column prop="stock_code" label="股票代号" />
+        <el-table-column prop="stock_name" label="股票名称" />
+        <el-table-column prop="buy_price" label="买入价格" />
+        <el-table-column prop="sell_price" label="卖出价格" />
+        <el-table-column prop="number" label="交易数量" />
+        <el-table-column prop="buy_cost" label="买入成本" />
+        <el-table-column prop="sell_cost" label="卖出成本" />
+        <el-table-column prop="total_cost" label="总成本" />
+        <el-table-column prop="transaction_rate" label="股价变化率" />
+        <el-table-column prop="gain_loss" label="持仓盈亏" />
+        <el-table-column prop="final_profit" label="清仓收益" />
+    </el-table>
 </template>
 
 <style>
@@ -33,6 +47,14 @@
 
 .calculate-button {
     width: 20%;
+}
+
+.el-table .warning-row {
+    --el-table-tr-bg-color: var(--el-color-warning-light-9);
+}
+
+.el-table .success-row {
+    --el-table-tr-bg-color: var(--el-color-success-light-9);
 }
 </style>
 
@@ -82,4 +104,37 @@ const onCalculate = async () => {
         // console.error('Error fetching zones:', error);
     }
 }
+
+interface TransactionResult {
+    stock_code: string
+    stock_name: string
+    buy_price: number
+    sell_price: number
+    number: number
+    buy_cost: number
+    sell_cost: number
+    total_cost: number
+    transaction_rate: number
+    gain_loss: number
+    final_profit: number
+}
+
+const tableRowClassName = ({
+    row,
+    rowIndex,
+}: {
+    row: TransactionResult
+    rowIndex: number
+}) => {
+    if (rowIndex === 1) {
+        return 'warning-row'
+    } else if (rowIndex === 3) {
+        return 'success-row'
+    }
+    return ''
+}
+
+const transactionResult: TransactionResult[] = [
+
+]
 </script>
