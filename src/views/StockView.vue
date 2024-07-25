@@ -114,27 +114,62 @@ interface TransactionResult {
     buy_cost: number
     sell_cost: number
     total_cost: number
-    transaction_rate: number
+    transaction_rate: string
     gain_loss: number
     final_profit: number
 }
 
 const tableRowClassName = ({
     row,
-    rowIndex,
 }: {
     row: TransactionResult
-    rowIndex: number
 }) => {
-    if (rowIndex === 1) {
+    if (row.final_profit < 0) {
         return 'warning-row'
-    } else if (rowIndex === 3) {
+    } else {
         return 'success-row'
     }
-    return ''
 }
 
 const transactionResult: TransactionResult[] = [
-
+    {
+        stock_code: '600030',
+        stock_name: '中信证券',
+        buy_price: 19.49,
+        sell_price: 19.60,
+        number: 2200,
+        buy_cost: 10.522261,
+        sell_cost: 32.141648,
+        total_cost: 42.663909,
+        transaction_rate: '0.56%',
+        gain_loss: 231.477739,
+        final_profit: 199.336091,
+    },
+    {
+        stock_code: '600250',
+        stock_name: '南京商旅',
+        buy_price: 8.43,
+        sell_price: 9.00,
+        number: 14000,
+        buy_cost: 28.962108,
+        sell_cost: 93.920400,
+        total_cost: 122.882508,
+        transaction_rate: '6.76%',
+        gain_loss: 7951.037892,
+        final_profit: 7857.117492,
+    },
+    {
+        stock_code: '603019',
+        stock_name: '中科曙光',
+        buy_price: 44,
+        sell_price: 42.82,
+        number: 1800,
+        buy_cost: 19.435680,
+        sell_cost: 57.452450,
+        total_cost: 76.888130,
+        transaction_rate: '-2.68%',
+        gain_loss: -2143.435680,
+        final_profit: -2200.888130,
+    },
 ]
 </script>
