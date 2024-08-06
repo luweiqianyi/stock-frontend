@@ -6,6 +6,13 @@
         <el-form-item label="股票名称">
             <el-input v-model="form.stock_name" />
         </el-form-item>
+        <el-form-item label="证券交易所">
+            <!-- focus: 用户点击并打开下拉菜单时会触发加载数据的动作, change: 设置选择之后的回调函数，比如可以查看选中的value值 -->
+            <el-select v-model="form.market" placeholder="please select your market" @focus="loadMarkets"
+                @change="handleMarketChange">
+                <el-option v-for="market in markets" :key="market" :label="market" :value="market" />
+            </el-select>
+        </el-form-item>
         <el-form-item label="买入价格">
             <el-input v-model="form.buy_price" />
         </el-form-item>
@@ -59,7 +66,7 @@
 </style>
 
 <script lang="ts" setup>
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
 const router = useRouter()
@@ -68,6 +75,7 @@ const router = useRouter()
 const form = reactive({
     stock_code: '',
     stock_name: '',
+    market: '',
     buy_price: '',
     number: '',
     sell_price: '',
@@ -101,7 +109,6 @@ const onCalculate = async () => {
         }
     } catch (error) {
         ElMessage(`request failed: ${error.message}`);
-        // console.error('Error fetching zones:', error);
     }
 }
 
@@ -172,4 +179,43 @@ const transactionResult: TransactionResult[] = [
         final_profit: -2200.888130,
     },
 ]
+
+const markets = ref([]);
+const loadMarkets = async () => {
+    try {
+        const requestOptions = {
+            method: 'POST', // 设置请求方法为 POST
+            headers: {
+                'Content-Type': 'application/json', // 设置请求头为 JSON
+                // 如果需要授权信息或其他自定义头部，可以在这里添加
+            },
+            // 如果有请求体数据，在这里添加
+            // body: JSON.stringify({ key: 'value' }),
+        };
+
+        const response = await fetch('http://127.0.0.1:8887/listMarketType', requestOptions);
+
+        // 检查响应状态码
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        // 确保响应的内容类型是 JSON
+        const contentType = response.headers.get("content-type");
+        console.log(contentType)
+        if (!contentType || !contentType.includes("application/json")) {
+            throw new TypeError("Received non-JSON response");
+        }
+
+        const data = await response.json();
+        markets.value = data.market_type
+    } catch (error) {
+        console.error('Error fetching markets:', error);
+    }
+};
+
+// 查看选择的值具体的值是什么
+const handleMarketChange = () => {
+    console.log('Selected region:', form.market);
+};
 </script>
