@@ -40,6 +40,7 @@
     <el-table :data="transactionResult" style="width: 100%" :row-class-name="tableRowClassName">
         <el-table-column prop="stock_code" label="股票代号" />
         <el-table-column prop="stock_name" label="股票名称" />
+        <el-table-column prop="market" label="证券交易所" />
         <el-table-column prop="buy_price" label="买入价格" />
         <el-table-column prop="sell_price" label="卖出价格" />
         <el-table-column prop="number" label="交易数量" />
@@ -74,8 +75,6 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
-import { useRouter } from 'vue-router'
-const router = useRouter()
 
 // do not use same name with ref
 const form = reactive({
@@ -89,62 +88,10 @@ const form = reactive({
     sell_date: '',
 })
 
-const onCalculate = async () => {
-    // 向服务端发起计算请求，显示计算结果
-    // 远程服务器验证
-    try {
-        // 传输方式：Content-Type: application/json\r\n
-        // const reqOptions = {
-        //     method: 'POST', // 设置请求方法为 POST
-        //     headers: {
-        //         'Content-Type': 'application/json', // 设置请求头为 JSON
-        //         // 如果需要授权信息或其他自定义头部，可以在这里添加
-        //     },
-        //     body: JSON.stringify({ // 这种方式是body里面加json数据
-        //         stock_code: form.stock_code,
-        //         stock_name: form.stock_name,
-        //         market: form.market,
-        //         buy_price: form.buy_price,
-        //         number: form.number,
-        //         sell_price: form.sell_price,
-        //         buy_date: form.buy_date,
-        //         sell_date: form.sell_date
-        //     }),
-        // }
-
-        const formData = new FormData();
-        formData.append('stock_code', form.stock_code);
-        formData.append('stock_name', form.stock_name);
-        formData.append('market', form.market);
-        formData.append('buy_price', form.buy_price);
-        formData.append('number', form.number);
-        formData.append('sell_price', form.sell_price);
-        formData.append('buy_date', form.buy_date);
-        formData.append('sell_date', form.sell_date);
-        // 传输方式：Content-Type: multipart/form-data; boundary=--------------------------117476911423769713475413\r\n
-        const requestOptions = {
-            method: 'POST', // 设置请求方法为 POST
-            body: formData,
-        };
-        const response = await fetch('http://127.0.0.1:8888/calculateTransactionProfit', requestOptions);
-
-        const result = await response.json();
-
-        if (response.ok) {
-            ElMessage('request success.');
-            console.log(result)
-            // router.push('/element-ui') // 登录成功，跳转到指定页面
-        } else {
-            ElMessage(`request failed: ${result.message}`);
-        }
-    } catch (error) {
-        ElMessage(`request failed: ${error.message}`);
-    }
-}
-
 interface TransactionResult {
     stock_code: string
     stock_name: string
+    market: string
     buy_price: number
     sell_price: number
     number: number
@@ -168,59 +115,62 @@ const tableRowClassName = ({
     }
 }
 
-const transactionResult: TransactionResult[] = [
-    {
-        stock_code: '600030',
-        stock_name: '中信证券',
-        buy_price: 19.49,
-        sell_price: 19.60,
-        number: 2200,
-        buy_cost: 10.522261,
-        sell_cost: 32.141648,
-        total_cost: 42.663909,
-        transaction_rate: '0.56%',
-        gain_loss: 231.477739,
-        final_profit: 199.336091,
-    },
-    {
-        stock_code: '600250',
-        stock_name: '南京商旅',
-        buy_price: 8.43,
-        sell_price: 9.00,
-        number: 14000,
-        buy_cost: 28.962108,
-        sell_cost: 93.920400,
-        total_cost: 122.882508,
-        transaction_rate: '6.76%',
-        gain_loss: 7951.037892,
-        final_profit: 7857.117492,
-    },
-    {
-        stock_code: '603019',
-        stock_name: '中科曙光',
-        buy_price: 44,
-        sell_price: 42.82,
-        number: 1800,
-        buy_cost: 19.435680,
-        sell_cost: 57.452450,
-        total_cost: 76.888130,
-        transaction_rate: '-2.68%',
-        gain_loss: -2143.435680,
-        final_profit: -2200.888130,
-    },
-]
+const transactionResult = ref<TransactionResult[]>([]);
+const onCalculate = async () => {
+    // 向服务端发起计算请求，显示计算结果
+    // 远程服务器验证
+    try {
+        const formData = new FormData();
+        formData.append('stock_code', form.stock_code);
+        formData.append('stock_name', form.stock_name);
+        formData.append('market', form.market);
+        formData.append('buy_price', form.buy_price);
+        formData.append('number', form.number);
+        formData.append('sell_price', form.sell_price);
+        formData.append('buy_date', form.buy_date);
+        formData.append('sell_date', form.sell_date);
+        // 传输方式：Content-Type: multipart/form-data; boundary=--------------------------117476911423769713475413\r\n
+        const requestOptions = {
+            method: 'POST', // 设置请求方法为 POST
+            body: formData,
+        };
+        const response = await fetch('http://127.0.0.1:8888/calculateTransactionProfit', requestOptions);
 
+        const result = await response.json();
+
+        if (response.ok) {
+            ElMessage('request success.');
+            // console.log(result) // 控制台查看返回的数据
+            const filteredResult: TransactionResult = {
+                stock_code: result.stock_code,
+                stock_name: result.stock_name,
+                market: result.market,
+                buy_price: result.buy_price,
+                sell_price: result.sell_price,
+                number: result.number,
+                buy_cost: result.buy_cost,
+                sell_cost: result.sell_cost,
+                total_cost: result.total_cost,
+                transaction_rate: (result.rate * 100).toFixed(2) + '%',
+                gain_loss: result.gain_loss,
+                final_profit: result.final_profit,
+            };
+            // 服务端返回的数据不是显示想要的数据，只摘取需要显示的数据
+            transactionResult.value = [filteredResult];
+        } else {
+            ElMessage(`request failed: ${result.message}`);
+        }
+    } catch (error) {
+        ElMessage(`request failed: ${error.message}`);
+    }
+}
+
+// 获取证券交易所下拉框的数据
 const markets = ref([]);
 const loadMarkets = async () => {
     try {
         const requestOptions = {
             method: 'POST', // 设置请求方法为 POST
-            headers: {
-                'Content-Type': 'application/json', // 设置请求头为 JSON
-                // 如果需要授权信息或其他自定义头部，可以在这里添加
-            },
-            // 如果有请求体数据，在这里添加
-            // body: JSON.stringify({ key: 'value' }),
         };
 
         const response = await fetch('http://127.0.0.1:8887/listMarketType', requestOptions);
