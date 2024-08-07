@@ -16,11 +16,11 @@
         <el-form-item label="买入价格">
             <el-input v-model="form.buy_price" />
         </el-form-item>
-        <el-form-item label="交易数量">
-            <el-input v-model="form.number" />
-        </el-form-item>
         <el-form-item label="卖出价格">
             <el-input v-model="form.sell_price" />
+        </el-form-item>
+        <el-form-item label="交易数量">
+            <el-input v-model="form.number" />
         </el-form-item>
         <el-form-item label="买入日期">
             <el-input v-model="form.buy_date" />
