@@ -22,6 +22,12 @@
         <el-form-item label="卖出价格">
             <el-input v-model="form.sell_price" />
         </el-form-item>
+        <el-form-item label="买入日期">
+            <el-input v-model="form.buy_date" />
+        </el-form-item>
+        <el-form-item label="卖出日期">
+            <el-input v-model="form.sell_date" />
+        </el-form-item>
         <!-- 默认的el-form-item类型是整个向左排列对其，如果需要居中效果需要自己加样式 -->
         <!-- <el-form-item>
             <el-button type="primary" @click="onCalculate">计算</el-button>
@@ -79,31 +85,55 @@ const form = reactive({
     buy_price: '',
     number: '',
     sell_price: '',
+    buy_date: '',
+    sell_date: '',
 })
 
 const onCalculate = async () => {
     // 向服务端发起计算请求，显示计算结果
     // 远程服务器验证
     try {
-        const response = await fetch('http://localhost:8081/profit_calculate', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                stock_code: form.stock_name,
-                stock_name: form.stock_name,
-                buy_price: form.buy_price,
-                number: form.number,
-                sell_price: form.sell_price,
-            }),
-        });
+        // 传输方式：Content-Type: application/json\r\n
+        // const reqOptions = {
+        //     method: 'POST', // 设置请求方法为 POST
+        //     headers: {
+        //         'Content-Type': 'application/json', // 设置请求头为 JSON
+        //         // 如果需要授权信息或其他自定义头部，可以在这里添加
+        //     },
+        //     body: JSON.stringify({ // 这种方式是body里面加json数据
+        //         stock_code: form.stock_code,
+        //         stock_name: form.stock_name,
+        //         market: form.market,
+        //         buy_price: form.buy_price,
+        //         number: form.number,
+        //         sell_price: form.sell_price,
+        //         buy_date: form.buy_date,
+        //         sell_date: form.sell_date
+        //     }),
+        // }
+
+        const formData = new FormData();
+        formData.append('stock_code', form.stock_code);
+        formData.append('stock_name', form.stock_name);
+        formData.append('market', form.market);
+        formData.append('buy_price', form.buy_price);
+        formData.append('number', form.number);
+        formData.append('sell_price', form.sell_price);
+        formData.append('buy_date', form.buy_date);
+        formData.append('sell_date', form.sell_date);
+        // 传输方式：Content-Type: multipart/form-data; boundary=--------------------------117476911423769713475413\r\n
+        const requestOptions = {
+            method: 'POST', // 设置请求方法为 POST
+            body: formData,
+        };
+        const response = await fetch('http://127.0.0.1:8888/calculateTransactionProfit', requestOptions);
 
         const result = await response.json();
 
         if (response.ok) {
             ElMessage('request success.');
-            router.push('/element-ui') // 登录成功，跳转到指定页面
+            console.log(result)
+            // router.push('/element-ui') // 登录成功，跳转到指定页面
         } else {
             ElMessage(`request failed: ${result.message}`);
         }
