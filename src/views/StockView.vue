@@ -23,10 +23,12 @@
             <el-input v-model="form.number" />
         </el-form-item>
         <el-form-item label="买入日期">
-            <el-date-picker v-model="form.buy_date" type="datetime" placeholder="Select date and time" />
+            <el-date-picker v-model="form.buy_date" type="datetime" format="YYYY-MM-DD HH:mm:ss"
+                placeholder="Select date and time" />
         </el-form-item>
         <el-form-item label="卖出日期">
-            <el-date-picker v-model="form.sell_date" type="datetime" placeholder="Select date and time" />
+            <el-date-picker v-model="form.sell_date" type="datetime" format="YYYY-MM-DD HH:mm:ss"
+                placeholder="Select date and time" />
         </el-form-item>
         <!-- 默认的el-form-item类型是整个向左排列对其，如果需要居中效果需要自己加样式 -->
         <!-- <el-form-item>
@@ -75,6 +77,7 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
+import { format } from 'date-fns' //npm install date-fns --save
 
 // do not use same name with ref
 const form = reactive({
@@ -127,8 +130,9 @@ const onCalculate = async () => {
         formData.append('buy_price', form.buy_price);
         formData.append('number', form.number);
         formData.append('sell_price', form.sell_price);
-        formData.append('buy_date', form.buy_date);
-        formData.append('sell_date', form.sell_date);
+        // format函数的作用就是将“Wed Jul 31 2024 09:49:19 GMT+0800 (中国标准时间)”类型的时间数据转化成服务器要求的时间格式“yyyy-MM-dd HH:mm:ss”
+        formData.append('buy_date', format(new Date(form.buy_date), 'yyyy-MM-dd HH:mm:ss'));
+        formData.append('sell_date', format(new Date(form.sell_date), 'yyyy-MM-dd HH:mm:ss'));
         // 传输方式：Content-Type: multipart/form-data; boundary=--------------------------117476911423769713475413\r\n
         const requestOptions = {
             method: 'POST', // 设置请求方法为 POST
