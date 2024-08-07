@@ -23,10 +23,10 @@
             <el-input v-model="form.number" />
         </el-form-item>
         <el-form-item label="买入日期">
-            <el-input v-model="form.buy_date" />
+            <el-date-picker v-model="form.buy_date" type="datetime" placeholder="Select date and time" />
         </el-form-item>
         <el-form-item label="卖出日期">
-            <el-input v-model="form.sell_date" />
+            <el-date-picker v-model="form.sell_date" type="datetime" placeholder="Select date and time" />
         </el-form-item>
         <!-- 默认的el-form-item类型是整个向左排列对其，如果需要居中效果需要自己加样式 -->
         <!-- <el-form-item>
