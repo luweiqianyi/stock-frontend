@@ -12,18 +12,18 @@ const router = createRouter({
     {
       path: '/about',
       name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
       component: () => import('../views/AboutView.vue')
     },
     {
       path: '/stock',
       name: 'stock',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
       component: () => import('../views/StockView.vue')
+    },
+    {
+      path: '/transactions',
+      name: 'transactions',
+      // 交易记录页面：查询所有已成交交易的详细情况
+      component: () => import('../views/TransactionView.vue')
     }
   ]
 })
