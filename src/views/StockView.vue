@@ -144,20 +144,20 @@ const onCalculate = async () => {
 
         if (response.ok) {
             ElMessage('request success.');
-            // console.log(result) // 控制台查看返回的数据
+            const data = result.data // 获取数据
             const filteredResult: TransactionResult = {
-                stock_code: result.stock_code,
-                stock_name: result.stock_name,
-                market: result.market,
-                buy_price: result.buy_price,
-                sell_price: result.sell_price,
-                number: result.number,
-                buy_cost: result.buy_cost,
-                sell_cost: result.sell_cost,
-                total_cost: result.total_cost,
-                transaction_rate: (result.rate * 100).toFixed(2) + '%',
-                gain_loss: result.gain_loss,
-                final_profit: result.final_profit,
+                stock_code: data.stock_code,
+                stock_name: data.stock_name,
+                market: data.market,
+                buy_price: data.buy_price,
+                sell_price: data.sell_price,
+                number: data.number,
+                buy_cost: data.buy_cost,
+                sell_cost: data.sell_cost,
+                total_cost: data.total_cost,
+                transaction_rate: (data.rate * 100).toFixed(2) + '%',
+                gain_loss: data.gain_loss,
+                final_profit: data.final_profit,
             };
             // 服务端返回的数据不是显示想要的数据，只摘取需要显示的数据
             transactionResult.value = [filteredResult];
