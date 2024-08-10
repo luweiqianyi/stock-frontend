@@ -25,8 +25,12 @@
         <el-table-column prop="market" label="证券交易所" />
         <el-table-column prop="buy_price" label="买入价格" />
         <el-table-column prop="sell_price" label="卖出价格" />
+        <el-table-column prop="rate" label="股价变化率" />
         <el-table-column prop="number" label="交易数量" />
         <el-table-column prop="invested_captical" label="投入本金" />
+        <el-table-column prop="buy_cost" label="买入费用" />
+        <el-table-column prop="sell_cost" label="卖出费用" />
+        <el-table-column prop="total_cost" label="总费用" />
         <el-table-column prop="profit" label="最终收益" />
     </el-table>
 </template>
@@ -98,8 +102,12 @@ interface ExpectedResult {
     market: string
     buy_price: number
     sell_price: number
+    rate: string
     number: number
     invested_captical: number
+    buy_cost: number
+    sell_cost: number
+    total_cost: number
     profit: number
 }
 
@@ -140,8 +148,12 @@ const onCalculate = async () => {
                 market: data.market,
                 buy_price: data.buy_price,
                 sell_price: data.sell_price,
+                rate: (data.rate * 100).toFixed(2) + '%',
                 number: data.number,
                 invested_captical: data.invested_captical,
+                buy_cost: data.buy_cost,
+                sell_cost: data.sell_cost,
+                total_cost: data.total_cost,
                 profit: data.profit,
             };
             // 服务端返回的数据不是显示想要的数据，只摘取需要显示的数据
