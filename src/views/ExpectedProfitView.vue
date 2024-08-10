@@ -11,6 +11,10 @@
         </el-form-item>
         <el-form-item label="卖出价格">
             <el-input v-model="form.sell_price" />
+            <div class="price-info">
+                <span>涨停价格：{{ ceil_price }}</span> |
+                <span>跌停价格：{{ floor_price }}</span>
+            </div>
         </el-form-item>
         <el-form-item label="账户余额">
             <el-input v-model="form.balance" />
@@ -55,15 +59,18 @@
 </style>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue'
+import { reactive, computed, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 
 const form = reactive({
     market: '',
-    buy_price: '',
-    sell_price: '',
-    balance: '',
+    buy_price: null as number | null,
+    sell_price: null as number | null,
+    balance: null as number | null,
 })
+
+const ceil_price = computed(() => form.buy_price ? (form.buy_price * 1.1).toFixed(2) : '0');
+const floor_price = computed(() => form.buy_price ? (form.buy_price * 0.9).toFixed(2) : '0');
 
 // 获取证券交易所下拉框的数据
 const markets = ref([]);
@@ -116,7 +123,7 @@ const tableRowClassName = ({
 }: {
     row: ExpectedResult
 }) => {
-    if (row.final_profit < 0) {
+    if (row.profit < 0) {
         return 'warning-row'
     } else {
         return 'success-row'
@@ -130,9 +137,9 @@ const onCalculate = async () => {
     try {
         const formData = new FormData();
         formData.append('market', form.market);
-        formData.append('buy_price', form.buy_price);
-        formData.append('sell_price', form.sell_price);
-        formData.append('balance', form.balance);
+        formData.append('buy_price', form.buy_price ? form.buy_price.toString() : '0');
+        formData.append('sell_price', form.sell_price ? form.sell_price.toString() : '0');
+        formData.append('balance', form.balance ? form.balance.toString() : '0');
         const requestOptions = {
             method: 'POST', // 设置请求方法为 POST
             body: formData,
