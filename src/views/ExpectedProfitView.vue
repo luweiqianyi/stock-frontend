@@ -1,5 +1,4 @@
 <template>
-    <span>Hello world</span>
     <el-form :model="form" label-width="auto" style="max-width: 600px">
         <el-form-item label="证券交易所">
             <el-select v-model="form.market" placeholder="please select your market" @focus="loadMarkets"
