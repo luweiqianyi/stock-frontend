@@ -59,65 +59,12 @@
 </style>
 
 <script lang="ts" setup>
-import { reactive, computed, ref } from 'vue'
-import { ElMessage } from 'element-plus'
 
-const form = reactive({
-    market: '',
-    buy_price: null as number | null,
-    sell_price: null as number | null,
-    balance: null as number | null,
-})
+import { ref, computed } from 'vue'; // 需要使用ref组件来保证渲染是响应式的渲染。
+import { useExpectedReturnsStore } from '@/stores/returns';
+import type { ExpectedResult } from '@/stores/returns';
 
-const ceil_price = computed(() => form.buy_price ? (form.buy_price * 1.1).toFixed(2) : '0');
-const floor_price = computed(() => form.buy_price ? (form.buy_price * 0.9).toFixed(2) : '0');
-
-// 获取证券交易所下拉框的数据
-const markets = ref([]);
-const loadMarkets = async () => {
-    try {
-        const requestOptions = {
-            method: 'POST', // 设置请求方法为 POST
-        };
-
-        const response = await fetch('http://127.0.0.1:8887/listMarketType', requestOptions);
-
-        // 检查响应状态码
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        // 确保响应的内容类型是 JSON
-        const contentType = response.headers.get("content-type");
-        console.log(contentType)
-        if (!contentType || !contentType.includes("application/json")) {
-            throw new TypeError("Received non-JSON response");
-        }
-
-        const data = await response.json();
-        markets.value = data.market_type
-    } catch (error) {
-        console.error('Error fetching markets:', error);
-    }
-};
-// 查看选择的值具体的值是什么
-const handleMarketChange = () => {
-    console.log('Selected region:', form.market);
-};
-
-interface ExpectedResult {
-    market: string
-    buy_price: number
-    sell_price: number
-    rate: string
-    number: number
-    invested_captical: number
-    buy_cost: number
-    sell_cost: number
-    total_cost: number
-    profit: number
-}
-
+// 表格样式计算
 const tableRowClassName = ({
     row,
 }: {
@@ -130,46 +77,27 @@ const tableRowClassName = ({
     }
 }
 
-const expectedResult = ref<ExpectedResult[]>([]);
+const store = useExpectedReturnsStore();
+const form = store.form
+
+// 计算涨停价格和跌停价格
+const ceil_price = computed(() => form.buy_price ? (form.buy_price * 1.1).toFixed(2) : '0');
+const floor_price = computed(() => form.buy_price ? (form.buy_price * 0.9).toFixed(2) : '0');
+
+// 界面中获取交易所类型
+const markets = ref<string[]>(store.markets)
+const loadMarkets = async () => {
+    await store.loadMarkets();
+    markets.value = store.markets;
+}
+
+// 控制台输出当前选择的交易所
+const handleMarketChange = store.handleMarketChange
+
+// 计算预期收益函数
+const expectedResult = ref(store.expectedResult);
 const onCalculate = async () => {
-    // 向服务端发起计算请求，显示计算结果
-    // 远程服务器验证
-    try {
-        const formData = new FormData();
-        formData.append('market', form.market);
-        formData.append('buy_price', form.buy_price ? form.buy_price.toString() : '0');
-        formData.append('sell_price', form.sell_price ? form.sell_price.toString() : '0');
-        formData.append('balance', form.balance ? form.balance.toString() : '0');
-        const requestOptions = {
-            method: 'POST', // 设置请求方法为 POST
-            body: formData,
-        };
-        const response = await fetch('http://127.0.0.1:8888/calExpectedReturns', requestOptions);
-
-        const result = await response.json();
-
-        if (response.ok) {
-            ElMessage('request success.');
-            const data = result.data // 获取数据
-            const filteredResult: ExpectedResult = {
-                market: data.market,
-                buy_price: data.buy_price,
-                sell_price: data.sell_price,
-                rate: (data.rate * 100).toFixed(2) + '%',
-                number: data.number,
-                invested_captical: data.invested_captical,
-                buy_cost: data.buy_cost,
-                sell_cost: data.sell_cost,
-                total_cost: data.total_cost,
-                profit: data.profit,
-            };
-            // 服务端返回的数据不是显示想要的数据，只摘取需要显示的数据
-            expectedResult.value = [filteredResult];
-        } else {
-            ElMessage(`request failed: ${result.message}`);
-        }
-    } catch (error) {
-        ElMessage(`request failed: ${error.message}`);
-    }
+    await store.calculateExpectedReturns();
+    expectedResult.value = store.expectedResult
 }
 </script>
