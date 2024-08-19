@@ -67,9 +67,9 @@ export const useExpectedReturnsStore = defineStore('expected-returns', {
             try {
                 const formData = new FormData();
                 formData.append('market', this.form.market);
-                formData.append('buy_price', this.form.buy_price ? this.form.buy_price : '0');
-                formData.append('sell_price', this.form.sell_price ? this.form.sell_price : '0');
-                formData.append('balance', this.form.balance ? this.form.balance : '0');
+                formData.append('buy_price', this.form.buy_price ? this.form.buy_price.toString() : '0');
+                formData.append('sell_price', this.form.sell_price ? this.form.sell_price.toString() : '0');
+                formData.append('balance', this.form.balance ? this.form.balance.toString() : '0');
                 const requestOptions = {
                     method: 'POST', // 设置请求方法为 POST
                     body: formData,
