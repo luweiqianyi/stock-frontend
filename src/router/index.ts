@@ -10,11 +10,6 @@ const router = createRouter({
       component: HomeView
     },
     {
-      path: '/about',
-      name: 'about',
-      component: () => import('../views/AboutView.vue')
-    },
-    {
       path: '/add-one-transaction-record',
       name: 'add-one-transaction-record',
       component: () => import('../views/StockView.vue')
