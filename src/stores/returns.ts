@@ -100,7 +100,8 @@ export const useExpectedReturnsStore = defineStore('expected-returns', {
                 }
             }
             catch (error) {
-                ElMessage(`request failed: ${error.message}`);
+                const err = error as Error;
+                ElMessage(`request failed: ${err.message}`);
             }
         }
     },

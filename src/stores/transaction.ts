@@ -125,7 +125,8 @@ export const useTransactionStore = defineStore('transaction', {
                     ElMessage(`request failed: ${result.message}`);
                 }
             } catch (error) {
-                ElMessage(`request failed: ${error.message}`);
+                const err = error as Error;
+                ElMessage(`request failed: ${err.message}`);
             }
         }
     },
