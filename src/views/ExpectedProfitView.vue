@@ -7,17 +7,17 @@
             </el-select>
         </el-form-item>
         <el-form-item label="买入价格">
-            <el-input v-model="form.buy_price" />
+            <el-input v-model="form.buy_price" @focus="clearBuyPrice" />
         </el-form-item>
         <el-form-item label="卖出价格">
-            <el-input v-model="form.sell_price" />
+            <el-input v-model="form.sell_price" @focus="clearSellPrice" />
             <div class="price-info">
                 <span>涨停价格：{{ ceil_price }}</span> |
                 <span>跌停价格：{{ floor_price }}</span>
             </div>
         </el-form-item>
         <el-form-item label="账户余额">
-            <el-input v-model="form.balance" />
+            <el-input v-model="form.balance" @focus="clearBalance" />
         </el-form-item>
         <div class="button-container">
             <el-button type="primary" @click="onCalculate" class="calculate-button">计算</el-button>
@@ -79,6 +79,18 @@ const tableRowClassName = ({
 
 const store = useExpectedReturnsStore();
 const form = store.form
+
+const clearBuyPrice = () => {
+    form.buy_price = null;
+}
+
+const clearSellPrice = () => {
+    form.sell_price = null;
+}
+
+const clearBalance = () => {
+    form.balance = null;
+}
 
 // 计算涨停价格和跌停价格
 const ceil_price = computed(() => form.buy_price ? (form.buy_price * 1.1).toFixed(2) : '0');

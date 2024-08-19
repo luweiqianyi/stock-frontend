@@ -3,9 +3,9 @@ import { ElMessage } from 'element-plus';
 
 interface ExpectedReturnsState {
     market: string;
-    buy_price: number;
-    sell_price: number;
-    balance: number;
+    buy_price: number | null;
+    sell_price: number | null;
+    balance: number | null;
 }
 
 export interface ExpectedResult {
@@ -25,9 +25,9 @@ export const useExpectedReturnsStore = defineStore('expected-returns', {
     state: () => ({
         form: {
             market: '',
-            buy_price: 0,
-            sell_price: 0,
-            balance: 0,
+            buy_price: null,
+            sell_price: null,
+            balance: null,
         } as ExpectedReturnsState,
         markets: [] as string[],
         expectedResult: [] as ExpectedResult[],
